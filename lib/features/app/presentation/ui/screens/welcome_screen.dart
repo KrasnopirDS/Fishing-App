@@ -1,4 +1,6 @@
+import 'package:fishing_app/router/screen_names.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 
 class WelcomeScreen extends StatelessWidget {
@@ -20,7 +22,7 @@ class WelcomeScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => context.goNamed(ScreenNames.home),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xffAEBE7C),
                 shape: RoundedRectangleBorder(
