@@ -28,4 +28,28 @@ class AppDatabase extends _$AppDatabase {
     )..orderBy([(t) => OrderingTerm.desc(t.createdAt)])).watch();
   }
 
+  Future<Fish> getFishById(int id) =>
+      (select(fishes)..where((t) => t.id.equals(id))).getSingle();
+
+  Future<int> addFish(FishesCompanion entry) => into(fishes).insert(entry);
+
+  Stream<List<Fish>> watchFishesByLocationId(int locationId) =>
+      (select(fishes)
+        ..where((t) => t.locationId.equals(locationId))
+        ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+          .watch();
+
+  Stream<List<Location>> watchAllLocations() {
+    return (select(
+      locations,
+    )..orderBy([(t) => OrderingTerm.desc(t.createdAt)])).watch();
+  }
+
+  Future<int> addLocation(LocationsCompanion entry) =>
+      into(locations).insert(entry);
+
+  Stream<Location?> watchLocationById(int id) =>
+      (select(locations)..where((t) => t.id.equals(id))).watchSingleOrNull();
+
+
 }

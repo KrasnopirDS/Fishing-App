@@ -22,7 +22,7 @@ class WelcomeScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
             ElevatedButton(
-              onPressed: () => context.goNamed(ScreenNames.home),
+              onPressed: () => context.goNamed(ScreenNames.fishingLog),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xffAEBE7C),
                 shape: RoundedRectangleBorder(

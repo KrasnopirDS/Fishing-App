@@ -1,5 +1,9 @@
-import 'package:fishing_app/features/home/data/repository/models/fish.dart';
+import 'dart:io';
+import 'package:fishing_app/features/home/presentation/cubit/home_cubit.dart';
+import 'package:fishing_app/features/home/presentation/cubit/home_state.dart';
+import 'package:fishing_app/router/screen_names.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,99 +27,119 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const .symmetric(horizontal: 8, vertical: 8),
-        child: ListView.separated(
-          itemBuilder: (context, index) {
-            final fish = fishes[index];
-            return GestureDetector(
-              onTap: () {},
-              child: Container(
-                height: 64,
-                decoration: const BoxDecoration(
-                  color: Color(0xffAEBE7C),
-                  borderRadius: .all(Radius.circular(4)),
-                ),
-                child: Row(
-                  spacing: 10,
-                  mainAxisAlignment: .start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const .all(Radius.circular(4)),
-                      child: Image.network(
-                        fish.imageUrl,
-                        width: 64,
+        child: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, state) {
+            return switch (state) {
+              HomeInitial() ||
+              HomeLoading() => const Center(child: CircularProgressIndicator()),
+              HomeLoaded(fishes: final fishes) => ListView.separated(
+                itemBuilder: (context, index) {
+                  final fish = fishes[index];
+                  return GestureDetector(
+                    onTap: () => context.goNamed(
+                      ScreenNames.fishDetails,
+                      pathParameters: {'fishId': fish.id.toString()},
+                    ),
+                    child: Container(
                         height: 64,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const .only(top: 8, right: 8),
-                        child: Column(
-                          spacing: 10,
-                          crossAxisAlignment: .start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: .spaceBetween,
-                              children: [
-                                Text(
-                                  fish.name,
-                                  style: const TextStyle(
-                                    fontFamily: 'Open Sans',
-                                    fontWeight: .w400,
-                                    fontSize: 14,
-                                    color: Color(0xff15282F),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: const Icon(Icons.edit, size: 24),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              spacing: 16,
-                              children: [
-                                Text(
-                                  'Weight: ${fish.weight} kg',
-                                  style: const TextStyle(
-                                    fontFamily: 'Open Sans',
-                                    fontWeight: .w300,
-                                    fontSize: 13,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  'Length: ${fish.length}cm',
-                                  style: const TextStyle(
-                                    fontFamily: 'Open Sans',
-                                    fontWeight: .w300,
-                                    fontSize: 13,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                        decoration: const BoxDecoration(
+                          color: Color(0xffAEBE7C),
+                          borderRadius: .all(Radius.circular(4)),
                         ),
-                      ),
+                        child: Row(
+                            spacing: 10,
+                            mainAxisAlignment: .start,
+                            children: [
+                        ClipRRect(
+                        borderRadius: const .all(Radius.circular(4)),
+                    child: Image.file(
+                      File(fish.imageUrl),
+                      width: 64,
+                      height: 64,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 64,
+                          height: 64,
+                          color: const Color(
+                            0xffAEBE7C,
+                          ).withValues(alpha: 0.5),
+                          child: const Icon(
+                            Icons.image_not_supported_outlined,
+                            color: Color(0xff15282F),
+                            size: 24,
+                          ),
+                        );
+                      },
                     ),
+                  ),
+                  Expanded(
+                  child: Padding(
+                  padding: const .only(top: 8, right: 8),
+                  child: Column(
+                  spacing: 10,
+                  crossAxisAlignment: .start,
+                  children: [
+                  Row(
+                  mainAxisAlignment: .spaceBetween,
+                  children: [
+                  Text(
+                  fish.name,
+                  style: const TextStyle(
+                  fontFamily: 'Open Sans',
+                  fontWeight: .w400,
+                  fontSize: 14,
+                  color: Color(0xff15282F),
+                  ),
+                  ),
+                  GestureDetector(
+                  onTap: () {},
+                  child: const Icon(Icons.edit, size: 24),
+                  ),
                   ],
-                ),
+                  ),
+                  Row(
+                  spacing: 16,
+
+                  children: [
+                  Text(
+                  'Weight: ${fish.weight} kg',
+                  style: const TextStyle(
+                  fontFamily: 'Open Sans',
+                  fontWeight: .w300,
+                  fontSize: 13,
+                  color: Colors.black,
+                  ),
+                  ),
+                  Text(
+                  'Length: ${fish.length}cm',
+                  style: const TextStyle(
+                  fontFamily: 'Open Sans',
+                  fontWeight: .w300,
+                  fontSize: 13,
+                  color: Colors.black,
+                  ),
+                  ),
+                  ],
+                  ),
+                  ],
+                  ),
+                  ),
+                  ),
+                  ],
+                  ),
+                  ),
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return const SizedBox(height: 8);
+                },
+                itemCount: fishes.length,
               ),
-            );
+              HomeError() => const Center(child: Text('Something went wrong')),
+            };
           },
-          separatorBuilder: (context, index) {
-            return const SizedBox(height: 8);
-          },
-          itemCount: fishes.length,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: const Color(0xffA2B568),
-        foregroundColor: const Color(0xff15282F),
-        shape: RoundedRectangleBorder(borderRadius: .circular(4)),
-        child: const Icon(Icons.add, size: 21),
       ),
       drawer: Drawer(
         backgroundColor: const Color(0xffAEBE7C),
@@ -146,7 +170,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () => context.goNamed(ScreenNames.fishingLog),
               minLeadingWidth: 32,
               horizontalTitleGap: 25,
               contentPadding: const .symmetric(horizontal: 10, vertical: 10),
@@ -188,6 +212,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             ListTile(
+
               minLeadingWidth: 32,
               horizontalTitleGap: 23,
               contentPadding: const .symmetric(horizontal: 10, vertical: 10),
@@ -213,4 +238,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-final fishes = <FishEntity>[];
